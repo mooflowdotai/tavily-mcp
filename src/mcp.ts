@@ -59,6 +59,7 @@ export class CustomMcpServer extends McpServer {
           ),
         time_range: z
           .enum(["day", "week", "month", "year", "d", "w", "m", "y"])
+          .nullable()
           .optional()
           .describe(
             "The relative time range to search within (e.g., 'day', 'month', etc.)"
