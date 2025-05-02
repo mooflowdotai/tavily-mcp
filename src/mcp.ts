@@ -35,55 +35,78 @@ export class CustomMcpServer extends McpServer {
   private registerTools(apiKey: string): void {
     this.tool(
       "tavily_search",
-      "Use Tavily AI-powered search engine to get real-time, rich web results.",
+      "A powerful web search tool that provides comprehensive, real-time results using Tavily's AI search engine.",
       {
         query: z.string().describe("Search query"),
         search_depth: z
           .enum(["basic", "advanced"])
           .optional()
-          .describe("Search depth"),
-        topic: z.enum(["general", "news"]).optional().describe("Search topic"),
-        days: z.number().optional().describe("How many days back to search"),
+          .default("basic")
+          .describe("The depth of the search. It can be 'basic' or 'advanced'"),
+        topic: z
+          .enum(["general", "news"])
+          .optional()
+          .default("general")
+          .describe(
+            "The category of the search. Determines which agent is used"
+          ),
+        days: z
+          .number()
+          .optional()
+          .default(3)
+          .describe(
+            "Number of days back from today to include in search results. Only applies to 'news' topic."
+          ),
         time_range: z
           .enum(["day", "week", "month", "year", "d", "w", "m", "y"])
-          .optional(),
-        max_results: z.number().min(5).max(20).optional(),
-        include_images: z.boolean().optional(),
-        include_image_descriptions: z.boolean().optional(),
-        include_raw_content: z.boolean().optional(),
-        include_domains: z.array(z.string()).optional(),
-        exclude_domains: z.array(z.string()).optional(),
+          .optional()
+          .describe(
+            "The relative time range to search within (e.g., 'day', 'month', etc.)"
+          ),
+        max_results: z
+          .number()
+          .min(5)
+          .max(20)
+          .optional()
+          .default(10)
+          .describe("Maximum number of search results to return"),
+        include_images: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe("Whether to include a list of images in the response"),
+        include_image_descriptions: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe("Whether to include image descriptions"),
+        include_raw_content: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe(
+            "Whether to include cleaned, parsed HTML content of results"
+          ),
+        include_domains: z
+          .array(z.string())
+          .optional()
+          .default([])
+          .describe("List of domains to include (e.g. ['nytimes.com'])"),
+        exclude_domains: z
+          .array(z.string())
+          .optional()
+          .default([])
+          .describe("List of domains to exclude"),
       },
-      async ({
-        query,
-        search_depth,
-        topic,
-        days,
-        time_range,
-        max_results,
-        include_images,
-        include_image_descriptions,
-        include_raw_content,
-        include_domains,
-        exclude_domains,
-      }) => {
+      async (args) => {
         try {
-          Logger.log("Calling Tavily Search API with:", query);
+          Logger.log("Calling Tavily Search API with:", args.query);
 
           const payload = {
-            query,
-            search_depth,
+            ...args,
             topic:
-              topic ||
-              (query.toLowerCase().includes("news") ? "news" : "general"),
-            days,
-            time_range,
-            max_results,
-            include_images,
-            include_image_descriptions,
-            include_raw_content,
-            include_domains,
-            exclude_domains,
+              args.topic ||
+              (args.query.toLowerCase().includes("news") ? "news" : "general"),
             api_key: apiKey,
           };
 
@@ -122,9 +145,21 @@ export class CustomMcpServer extends McpServer {
       "tavily_extract",
       "Extract detailed content from specific URLs using Tavily's extractor.",
       {
-        urls: z.array(z.string()).describe("List of URLs to extract from"),
-        extract_depth: z.enum(["basic", "advanced"]).optional(),
-        include_images: z.boolean().optional(),
+        urls: z
+          .array(z.string())
+          .describe("List of URLs to extract content from"),
+        extract_depth: z
+          .enum(["basic", "advanced"])
+          .optional()
+          .default("basic")
+          .describe(
+            "Extraction depth – use 'advanced' for rich structured content (e.g., LinkedIn)"
+          ),
+        include_images: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe("Include images extracted from the pages"),
       },
       async ({ urls, extract_depth, include_images }) => {
         try {
