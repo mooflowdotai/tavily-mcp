@@ -40,12 +40,18 @@
   "author": "Tavily",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.6.0",
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "axios": "^1.6.7",
     "dotenv": "^16.4.5",
-    "axios": "^1.6.7"
+    "express": "^5.1.0",
+    "js-yaml": "^4.1.0",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.24",
+    "@types/yargs": "^17.0.33",
     "typescript": "^5.3.3"
   }
 }
