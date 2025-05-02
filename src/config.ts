@@ -1,4 +1,9 @@
+import { config } from "dotenv";
 import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+
+// Load environment variables from .env file
+config();
 
 interface ServerConfig {
   tavilyApiKey: string;
@@ -82,7 +87,4 @@ export function getServerConfig(isStdioMode = false): ServerConfig {
   }
 
   return config;
-}
-function hideBin(argv: string[]): string | readonly string[] | undefined {
-  throw new Error("Function not implemented.");
 }
